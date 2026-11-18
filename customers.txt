@@ -1,0 +1,82 @@
+9
+Mara the Baker
+I need something warm and calming.
+3
+9
+3
+-3
+30
+0
+1
+Oliver the Farmer
+I need a warm potion for energy.
+8
+1
+7
+2
+30
+0
+1
+Luna the Traveller
+I need a cooling and calming potion.
+-3
+8
+2
+0
+30
+0
+1
+Arthur the Knight
+I need energy without too much heat.
+-1
+3
+7
+1
+40
+0
+2
+Sofia the Healer
+I need a balanced and soothing potion.
+1
+8
+3
+-2
+40
+0
+2
+Henry the Merchant
+I need something sweet and energising.
+5
+4
+8
+-2
+45
+0
+2
+Isabella the Queen
+Create a cool bitter potion that calms me.
+-5
+8
+-2
+7
+60
+3
+3
+Elias the Wizard
+Balance warmth, calm, energy and bitterness.
+3
+6
+4
+-1
+55
+0
+3
+Rowan the Alchemist
+Make a cool potion with energy and little bitterness.
+-2
+5
+5
+-1
+60
+0
+3
