@@ -1,6 +1,7 @@
+
 # Alchemist's Apothecary – themed local prototype
 
-A local presentation prototype of the COS10009 Ruby and Gosu potion-brewing project. The original three-level gameplay, ingredient values, scoring formula, gold, reputation and ten-order ending are preserved. An extra royal customer profile allows four separate Level 3 orders when the player's reputation is at least three.
+A local presentation prototype of the COS10009 Ruby and Gosu potion-brewing project. The original three-level gameplay, ingredient values, match-scoring formula, reputation and ten-order ending are preserved, with a perfect-potion gold bonus and new challenge rules. An extra royal customer profile allows four separate Level 3 orders when the player's reputation is at least three.
 
 ## Run on Windows
 
@@ -20,7 +21,7 @@ Ruby and Gosu are the only runtime requirements. If Gosu is absent, use `gem ins
 
 - Left mouse button: select shop items, brewing ingredients and navigation buttons.
 - F11: toggle fullscreen (Gosu's built-in shortcut).
-- M or Sound button: toggle audio. V: replay the current guide narration (when available).
+- M: toggle all audio. The Music and SFX buttons independently control background music and sound effects (including narration). V: replay the current guide narration (when available).
 - R: reset to the main menu. Escape: quit.
 - Level 1 (orders 1–3): blue scenery, Witch guide, at least 2 ingredients. First-order narration suggests a valid recipe based on the selected customer.
 - Level 2 (orders 4–6): green/teal castle scenery, Night Witch guide, at least 3 ingredients.
@@ -29,14 +30,19 @@ Ruby and Gosu are the only runtime requirements. If Gosu is absent, use `gem ins
 - Help costs 100 gold per customer order, reveals quantities for that customer, and can be replayed at no further cost until serving. Ingredient purchases remain separate. Nine recipes score 100%; Princess has a verified 98% recipe (the existing target is difficult to match exactly). Insufficient gold rejects help without charging.
 - Happy results fade in a Night Witch heart emote; satisfied results fade in a Wizard; disappointed results fade in an Electric Wizard.
 - Customers are selected without repeating previously selected eligible profiles until the available pool is exhausted. Consecutive duplicates are avoided when there is another eligible customer. Princess requires reputation 3, so a repeat is still possible if reputation is too low to unlock all four final-level profiles.
-- The final results screen shows gold, reputation and average match score.
+- Customer patience: Level 1 is untimed; Level 2 gives 90 seconds and Level 3 gives 60 seconds per order. The clock starts on the first click of Start Brewing for each timed order and continues if the player returns to the shop. At zero, the customer leaves, the order earns 0% and no gold, reputation falls by one (minimum zero), and ingredients still in the cauldron are consumed. Continue to the next customer from the results screen.
+- Star ratings: happy (80–100%) = 3 stars, satisfied (50–79%) = 2 stars, and disappointed (0–49%) = 1 star. A timed-out order receives one star and a 0% match.
+- A perfect 100% potion earns 15 bonus gold in addition to the customer's base payment. Lower scores use the original payment formula.
+- Win by completing ten orders with a rounded average match score of at least 80%; otherwise the final screen shows a loss. A timeout counts as an order. Restart or play again if needed.
+- High score: the best rounded average over completed games is shown on the menu and final results. It persists in `high_score.txt`, created/updated when a new positive record is set. Keep the game in a writable folder.
 
 ## Project structure
 
-- `alchemist.rb`: complete Ruby source (990 lines in this delivery).
+- `alchemist.rb`: complete Ruby source (999 lines in this delivery).
 - `ingredients.txt`: six ingredient records; unchanged values.
 - `customers.txt`: ten customer profiles, including a sprite filename field.
 - `guide.txt`: nineteen subtitle records keyed to the matching WAV audio file.
+- `high_score.txt`: generated locally on a new positive record; not required before running.
 - `assets/backgrounds/`: four background images.
 - `assets/characters/`: fourteen transparent PNG illustrations cut from the supplied reference screenshots.
 - `sounds/`: six sound effects, an original 40-second loop, and `voices/` containing the synthetic narration.
@@ -49,6 +55,6 @@ The instructional voice clips are synthetic English text-to-speech produced with
 
 ## Verification status
 
-`ruby -c` reports Syntax OK. A headless Ruby test using a Gosu stand-in passed 160 checks, including all ten recipe scores, first-order narration, silent rounds and results, level introductions, help rejection and one-time charging, help persistence across screens, and completion. These checks do not prove actual Windows/Gosu rendering or audio playback; test locally. This version modifies the previously supplied ZIP, not an independently retrieved repository copy.
+`ruby -c` reports Syntax OK. The complete Ruby source is 999 physical lines. Headless tests using a Gosu stand-in passed 160 regression checks and 46 additional checks covering star thresholds, the bonus, timed levels, timeout behavior, returning to the shop, audio settings, win/loss screens, persistent high score and restart. These checks do not verify actual Windows/Gosu rendering or audio playback. This version modifies the previously supplied ZIP rather than an independently retrieved repository copy. All existing media and data files are preserved.
 
-Suggested real-game tests: play the first order, check silent narration on order two, try Help with less than 100 gold, buy a recipe with sufficient gold, replay it without a second charge, return to the shop, and check the new-level introductions and silent results. Keep the old version as a backup.
+Suggested real-game tests: check independent audio buttons and first-order narration; serve a perfect potion; test the Level 2 and 3 timers, including returning to the shop and letting time run out; check all star ratings; complete a winning and a losing run; restart the program and verify that the best average remains. Keep the old version as a backup. The guides retain their existing instructional recordings; the written How to Play screen describes the new rules.

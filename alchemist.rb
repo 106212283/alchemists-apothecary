@@ -1,5 +1,5 @@
-require 'gosu'
 
+require 'gosu'
 # Alchemist's Apothecary - themed edition
 # Amani Abdelrahim Elsayed | COS10009 Introduction to Programming
 # Main game data and procedures
@@ -26,9 +26,11 @@ module Difficulty
   MEDIUM = 2
   HARD = 3
 end
-
 TOTAL_CUSTOMERS = 10
 STARTING_GOLD = 100
+WIN_SCORE = 80
+PERFECT_BONUS = 15
+PATIENCE_SECONDS = [0, 90, 60]
 ROOT = __dir__
 # Composite data types (records)
 class Ingredient
@@ -49,7 +51,7 @@ class Potion
   end
 end
 class Result
-  attr_accessor :match_score, :payment, :reputation_change, :mood
+  attr_accessor :match_score, :payment, :reputation_change, :mood, :timed_out
 end
 class Player
   attr_accessor :gold, :reputation, :customers_served, :inventory
@@ -77,8 +79,7 @@ def load_ingredients(filename)
   ingredients = []
   file = open_data(filename)
   count = read_field(file).to_i
-  index = 0
-  while index < count
+  count.times do
     ingredient = Ingredient.new
     ingredient.name = read_field(file)
     ingredient.heat = read_field(file).to_i
@@ -92,7 +93,6 @@ def load_ingredients(filename)
     ingredient.cost = read_field(file).to_i
     ingredient.min_reputation = read_field(file).to_i
     ingredients << ingredient
-    index += 1
   end
   file.close
   return ingredients
@@ -101,8 +101,7 @@ def load_customers(filename)
   customers = []
   file = open_data(filename)
   count = read_field(file).to_i
-  index = 0
-  while index < count
+  count.times do
     customer = Customer.new
     customer.name = read_field(file)
     customer.request_text = read_field(file)
@@ -115,20 +114,15 @@ def load_customers(filename)
     customer.difficulty = read_field(file).to_i
     customer.image_name = read_field(file)
     customers << customer
-    index += 1
   end
   file.close
   return customers
 end
 # Three levels share the same brewing logic.
 def get_level(customers_served)
-  if customers_served < 3
-    return Difficulty::EASY
-  elsif customers_served < 6
-    return Difficulty::MEDIUM
-  else
-    return Difficulty::HARD
-  end
+  return Difficulty::EASY if customers_served < 3
+  return Difficulty::MEDIUM if customers_served < 6
+  return Difficulty::HARD
 end
 def get_level_name(level)
   return ['Apprentice', 'Skilled', 'Master'][level - 1]
@@ -138,13 +132,8 @@ def minimum_ingredients(level)
 end
 def get_available_customers(customers, reputation, level)
   available = []
-  index = 0
-  while index < customers.length
-    customer = customers[index]
-    if customer.min_reputation <= reputation && customer.difficulty == level
-      available << customer
-    end
-    index += 1
+  customers.each do |customer|
+    available << customer if customer.min_reputation <= reputation && customer.difficulty == level
   end
   return available
 end
@@ -158,19 +147,14 @@ def choose_next_customer(game)
     return
   end
   choices = []
-  index = 0
-  while index < available.length
-    customer = available[index]
+  available.each do |customer|
     choices << customer unless game.seen_customers.include?(customer.name)
-    index += 1
   end
   if choices.empty?
     game.seen_customers = []
     choices = available.dup
   end
-  if choices.length > 1
-    choices.delete(game.current_customer)
-  end
+  choices.delete(game.current_customer) if choices.length > 1
   game.current_customer = choices[rand(choices.length)]
   game.seen_customers << game.current_customer.name
 end
@@ -189,11 +173,8 @@ def create_game_data
   player.reputation = 0
   player.customers_served = 0
   player.inventory = []
-  index = 0
-  while index < game.ingredients.length
-    quantity = game.ingredients[index].min_reputation == 0 ? 2 : 0
-    player.inventory << quantity
-    index += 1
+  game.ingredients.each do |ingredient|
+    player.inventory << (ingredient.min_reputation == 0 ? 2 : 0)
   end
   game.player = player
   game.message = 'Welcome to the Apothecary!'
@@ -270,10 +251,8 @@ def add_to_cauldron(game, index)
   return true
 end
 def clear_cauldron(game)
-  index = 0
-  while index < game.cauldron.length
-    update_inventory(game.player, game.cauldron[index], 1)
-    index += 1
+  game.cauldron.each do |index|
+    update_inventory(game.player, index, 1)
   end
   game.cauldron = []
   game.potion = Potion.new
@@ -296,45 +275,54 @@ def calculate_match_score(potion, customer)
   return [score, 0].max
 end
 def determine_mood(score)
-  if score >= 80
-    return CustomerMood::HAPPY
-  elsif score >= 50
-    return CustomerMood::SATISFIED
-  else
-    return CustomerMood::DISAPPOINTED
-  end
+  return CustomerMood::HAPPY if score >= 80
+  return CustomerMood::SATISFIED if score >= 50
+  return CustomerMood::DISAPPOINTED
 end
 def get_mood_name(mood)
   return ['HAPPY', 'SATISFIED', 'DISAPPOINTED'][mood]
 end
 def calculate_payment(score, customer)
-  return (customer.base_payment * score / 100.0).round
+  bonus = score == 100 ? PERFECT_BONUS : 0
+  return (customer.base_payment * score / 100.0).round + bonus
+end
+def load_high_score
+  path = File.join(ROOT, "high_score.txt")
+  return 0 unless File.exist?(path)
+  return [[File.read(path).to_i, 0].max, 100].min
+rescue SystemCallError
+  return 0
+end
+def save_high_score(score)
+  File.write(File.join(ROOT, "high_score.txt"), score.to_s + "\n")
+  return true
+rescue SystemCallError
+  return false
 end
 def calculate_average_score(scores)
   return 0 if scores.empty?
   total = 0
-  index = 0
-  while index < scores.length
-    total += scores[index]
-    index += 1
+  scores.each do |score|
+    total += score
   end
   return (total.to_f / scores.length).round
 end
 def check_game_end(game)
   return game.player.customers_served >= TOTAL_CUSTOMERS
 end
-def serve_potion(game)
-  return false if game.current_customer.nil? || check_game_end(game)
+def serve_potion(game, timed_out = false)
+  return false if game.current_customer.nil? || check_game_end(game) || game.screen == GameScreen::RESULTS
   required = minimum_ingredients(get_level(game.player.customers_served))
-  if game.cauldron.empty?
+  if !timed_out && game.cauldron.empty?
     game.message = 'Your cauldron is empty.'
     return false
-  elsif game.cauldron.length < required
+  elsif !timed_out && game.cauldron.length < required
     game.message = "You need at least #{required} ingredients."
     return false
   end
   result = Result.new
-  result.match_score = calculate_match_score(game.potion, game.current_customer)
+  result.timed_out = timed_out
+  result.match_score = timed_out ? 0 : calculate_match_score(game.potion, game.current_customer)
   result.mood = determine_mood(result.match_score)
   result.payment = calculate_payment(result.match_score, game.current_customer)
   change = [1, 0, -1][result.mood]
@@ -347,7 +335,7 @@ def serve_potion(game)
   game.result = result
   game.cauldron = []
   game.screen = GameScreen::RESULTS
-  game.message = check_game_end(game) ? 'All customers served!' : 'Potion served successfully.'
+  game.message = timed_out ? 'Time expired! Customer left; no payment.' : 'Potion served successfully.'
   return true
 end
 # Presentation: Gosu images, sounds, animation and mouse events.
@@ -377,7 +365,10 @@ class AlchemistApp < Gosu::Window
     @ingredient_page = 0
     @animation = 0
     @reaction_alpha = 0
-    @muted = false
+    @music_muted = false
+    @effects_muted = false
+    @deadline = nil
+    @high_score = load_high_score
     @speech = nil
     @guide_line = nil
     @paid_help = nil
@@ -399,43 +390,35 @@ class AlchemistApp < Gosu::Window
     @reaction_images = []
     @customer_images = []
     @mentor_names = ['Witch', 'Night Witch', 'Fire Wizard']
-    index = 0
-    while index < 3
+    3.times do |index|
       @backgrounds << image_asset('backgrounds', "level#{index + 1}.jpg")
       @mentor_images << image_asset('characters', ['witch.png', 'night_witch.png', 'red_wizard.png'][index])
       @reaction_images << image_asset('characters', ['happy_emote.png', 'wizard.png', 'angry_wizard.png'][index])
-      index += 1
     end
     @menu_background = image_asset('backgrounds', 'menu.jpg')
-    index = 0
-    while index < @game.customers.length
-      @customer_images << image_asset('characters', @game.customers[index].image_name + '.png')
-      index += 1
+    @game.customers.each do |customer|
+      @customer_images << image_asset('characters', customer.image_name + '.png')
     end
     @sound_names = ['click', 'coin', 'splash', 'success', 'error', 'level_up']
     @sounds = []
-    index = 0
-    while index < @sound_names.length
-      @sounds << Gosu::Sample.new(File.join(ROOT, 'sounds', @sound_names[index] + '.wav'))
-      index += 1
+    @sound_names.each do |name|
+      @sounds << Gosu::Sample.new(File.join(ROOT, 'sounds', name + '.wav'))
     end
     @music = Gosu::Song.new(File.join(ROOT, 'sounds', 'background.wav'))
     @guide_lines = []
     file = open_data('guide.txt')
     count = read_field(file).to_i
-    index = 0
-    while index < count
+    count.times do
       line = GuideLine.new
       line.key = read_field(file)
       line.text = read_field(file)
       line.sample = Gosu::Sample.new(File.join(ROOT, 'sounds', 'voices', line.key + '.wav'))
       @guide_lines << line
-      index += 1
     end
     file.close
   end
   def play_sound(name)
-    return if @muted
+    return if @effects_muted
     index = @sound_names.index(name)
     @sounds[index].play(0.45) unless index.nil?
   end
@@ -448,35 +431,41 @@ class AlchemistApp < Gosu::Window
   end
   def replay_voice
     stop_voice
-    @speech = @guide_line.sample.play(0.9) if !@guide_line.nil? && !@muted
+    @speech = @guide_line.sample.play(0.9) if !@guide_line.nil? && !@effects_muted
   end
   def say(key)
-    index = 0
-    while index < @guide_lines.length
-      if @guide_lines[index].key == key
-        @guide_line = @guide_lines[index]
-        replay_voice
-        return
-      end
-      index += 1
+    @guide_lines.each do |line|
+      next unless line.key == key
+      @guide_line = line
+      replay_voice
+      return
     end
   end
   def toggle_audio
-    @muted = !@muted
-    if @muted
-      stop_voice
-      @music.volume = 0
+    muted = !(@music_muted && @effects_muted)
+    @music_muted = @effects_muted = muted
+    stop_voice if muted
+  end
+  def handle_audio_click(mx, my)
+    if clicked?(mx, my, 862, 30, 146, 37)
+      @music_muted = !@music_muted
+    elsif clicked?(mx, my, 1018, 30, 146, 37)
+      @effects_muted = !@effects_muted
+      stop_voice if @effects_muted
     else
-      @music.volume = 0.22
+      return false
     end
+    return true
+  end
+  def remaining_seconds
+    return [(@deadline - Gosu.milliseconds + 999) / 1000, 0].max
   end
   def update
     @animation = (@animation + 1) % 120
-    if @game.screen == GameScreen::RESULTS
-      @reaction_alpha = [255, @reaction_alpha + 9].min
-    end
+    @reaction_alpha = [255, @reaction_alpha + 9].min if @game.screen == GameScreen::RESULTS
     # Lower music while the mentor is speaking.
-    @music.volume = @muted ? 0 : (speaking? ? 0.07 : 0.22)
+    @music.volume = @music_muted ? 0 : (speaking? ? 0.07 : 0.22)
+    finish_potion(@game, true) if @deadline && Gosu.milliseconds >= @deadline
   end
   def current_level(game)
     round = game.player.customers_served
@@ -503,6 +492,7 @@ class AlchemistApp < Gosu::Window
     @ingredient_page = 0
     @reaction_alpha = 0
     @first_brew_explained = false
+    @deadline = nil
     @paid_help = nil
     shop_voice(@game) unless @game.current_customer.nil?
   end
@@ -511,6 +501,8 @@ class AlchemistApp < Gosu::Window
     stop_voice
     @guide_line = @paid_help
     game.screen = GameScreen::BREWING
+    seconds = PATIENCE_SECONDS[current_level(game) - 1]
+    @deadline ||= Gosu.milliseconds + seconds * 1000 if seconds > 0
     game.message = 'Compare your potion with the target.'
     if game.player.customers_served == 0 && !@first_brew_explained
       @first_brew_explained = true
@@ -534,8 +526,9 @@ class AlchemistApp < Gosu::Window
       play_sound('coin')
     end
   end
-  def finish_potion(game)
-    unless serve_potion(game)
+  def finish_potion(game, timed_out = false)
+    timed_out = timed_out || (!@deadline.nil? && Gosu.milliseconds >= @deadline)
+    unless serve_potion(game, timed_out)
       play_sound('error')
       return
     end
@@ -543,7 +536,18 @@ class AlchemistApp < Gosu::Window
     @guide_line = nil
     @paid_help = nil
     @reaction_alpha = 0
-    if check_game_end(game) || get_level(game.player.customers_served) > current_level(game)
+    @deadline = nil
+    if check_game_end(game)
+      average = calculate_average_score(game.scores)
+      if average > @high_score
+        @high_score = average
+        game.message = "New high score!" unless timed_out
+        game.message = "High score could not be saved." unless save_high_score(average)
+      end
+      play_sound(average >= WIN_SCORE ? 'level_up' : 'error')
+    elsif timed_out
+      play_sound('error')
+    elsif get_level(game.player.customers_served) > current_level(game)
       play_sound('level_up')
     else
       play_sound(['success', 'click', 'error'][game.result.mood])
@@ -567,17 +571,15 @@ class AlchemistApp < Gosu::Window
   def wrap_text(message, x, y, width, font = @small_font, colour = WHITE)
     words = message.split(' ')
     line = ''
-    index = 0
-    while index < words.length
-      candidate = line.empty? ? words[index] : line + ' ' + words[index]
+    words.each do |word|
+      candidate = line.empty? ? word : line + ' ' + word
       if !line.empty? && font.text_width(candidate) > width
         text(line, x, y, colour, font)
         y += font.height + 5
-        line = words[index]
+        line = word
       else
         line = candidate
       end
-      index += 1
     end
     text(line, x, y, colour, font) unless line.empty?
   end
@@ -623,10 +625,19 @@ class AlchemistApp < Gosu::Window
     text("Customer: #{round}/#{TOTAL_CUSTOMERS}", 434, 66)
     level = current_level(game)
     text("Level #{level} - #{get_level_name(level)}", 674, 65, GOLD)
-    button(1018, 30, 146, 37, @muted ? 'Sound: OFF' : 'Sound: ON', GREY)
+    draw_audio_buttons
+    if @deadline
+      text("Time: #{remaining_seconds}s", 1000, 72, remaining_seconds <= 15 ? BAD : GOLD, @small_font)
+    elsif game.screen == GameScreen::SHOP && level > 1
+      text("Ready: #{PATIENCE_SECONDS[level - 1]}s", 1000, 72, GOLD, @small_font)
+    end
     Gosu.draw_rect(36, 99, 1128, 5, GREY, 3)
     progress = game.player.customers_served.to_f / TOTAL_CUSTOMERS
     Gosu.draw_rect(36, 99, 1128 * progress, 5, level_colour(game), 4)
+  end
+  def draw_audio_buttons
+    button(862, 30, 146, 37, @music_muted ? "Music: OFF" : "Music: ON", GREY)
+    button(1018, 30, 146, 37, @effects_muted ? "SFX: OFF" : "SFX: ON", GREY)
   end
   def draw_message(game)
     panel(20, 742, 1160, 40)
@@ -666,12 +677,10 @@ class AlchemistApp < Gosu::Window
     Gosu.draw_rect(x - 120 * scale, y - 9 * scale, 240 * scale, 28 * scale, rim, 3)
     Gosu.draw_rect(x - 110 * scale, y - 3 * scale, 220 * scale, 17 * scale, colour, 4)
     if active
-      index = 0
-      while index < 5
+      5.times do |index|
         offset = (@animation + index * 15) % 60
         size = (7 + index % 3 * 3) * scale
         Gosu.draw_rect(x + (-80 + index * 39) * scale, y - (15 + offset) * scale, size, size, colour, 4)
-        index += 1
       end
     end
   end
@@ -686,7 +695,8 @@ class AlchemistApp < Gosu::Window
     button(440, 478, 320, 54, 'Play Game', BLUE)
     button(440, 548, 320, 54, 'How to Play', PURPLE)
     button(440, 618, 320, 54, 'Exit Game', GREY)
-    centre('F11: Fullscreen | M: Sound', 260, 680, 689, GOLD, @small_font)
+    centre("Best average: #{@high_score}% | F11: Fullscreen | M: All sound", 260, 680, 689, GOLD, @small_font)
+    draw_audio_buttons
   end
   def draw_instructions(game)
     draw_guide(game, true)
@@ -699,13 +709,13 @@ class AlchemistApp < Gosu::Window
                     '5. Clear the cauldron to recover the unused ingredients.',
                     '6. Serve your potion to earn gold and reputation.',
                     '7. Complete ten customer orders to finish the game.']
-    index = 0
-    while index < instructions.length
-      text(instructions[index], 321, 223 + index * 41)
-      index += 1
+    instructions.each_with_index do |instruction, index|
+      text(instruction, 321, 223 + index * 41)
     end
-    text('Level 1: 2 ingredients | Level 2: 3 | Level 3: 4', 321, 534, GOLD)
-    text('First order and new levels have guidance. Help costs 100 gold.', 321, 580, WHITE)
+    text('Level 1: 2 ingredients, no timer | Level 2: 3, 90s | Level 3: 4, 60s', 321, 516, GOLD, @small_font)
+    text('Timer begins when brewing starts and continues in the shop.', 321, 545, WHITE, @small_font)
+    text('Win with 80% average. Perfect potion: +15 gold. Help: 100 gold.', 321, 574, WHITE, @small_font)
+    draw_audio_buttons
     button(555, 645, 350, 50, 'Back to Menu', PURPLE)
   end
   # Ingredient shop and brewing share the same cards and input positions.
@@ -716,8 +726,7 @@ class AlchemistApp < Gosu::Window
     return 225 + (slot / 2) * 112
   end
   def draw_ingredient_cards(game, shopping)
-    slot = 0
-    while slot < 6
+    6.times do |slot|
       index = @ingredient_page * 6 + slot
       if index < game.ingredients.length
         ingredient = game.ingredients[index]
@@ -745,7 +754,6 @@ class AlchemistApp < Gosu::Window
         end
         text(label, x + 12, y + 73, WHITE, @small_font)
       end
-      slot += 1
     end
     pages = (game.ingredients.length / 6.0).ceil
     if pages > 1
@@ -774,7 +782,7 @@ class AlchemistApp < Gosu::Window
     wrap_text(customer.request_text, 799, 486, 355, @font)
     level = current_level(game)
     text("Minimum ingredients: #{minimum_ingredients(level)}", 799, 555, GOLD)
-    text("Maximum payment: #{customer.base_payment} gold", 799, 589)
+    text("Perfect payment: #{customer.base_payment + PERFECT_BONUS} gold", 799, 589)
     button(799, 641, 357, 58, 'Start Brewing', level_colour(game))
   end
   def draw_properties(game)
@@ -783,15 +791,13 @@ class AlchemistApp < Gosu::Window
     text('Property', 800, 461, GOLD, @small_font)
     text('Potion', 958, 461, GOLD, @small_font)
     text('Target', 1082, 461, GOLD, @small_font)
-    index = 0
-    while index < names.length
+    names.each_with_index do |name, index|
       y = 493 + index * 37
       value = game.potion.properties[index]
       colour = game.potion.ingredient_count > 0 && value == targets[index] ? GOOD : WHITE
-      text(names[index], 800, y)
+      text(name, 800, y)
       centre(value.to_s, 944, 85, y, colour)
       centre(targets[index].to_s, 1064, 85, y)
-      index += 1
     end
   end
   def draw_brewing(game)
@@ -826,16 +832,20 @@ class AlchemistApp < Gosu::Window
     Gosu.draw_rect(330, 330, 490, 18, GREY, 3)
     Gosu.draw_rect(330, 330, 490 * result.match_score / 100.0, 18, colour, 4)
     centre("Customer mood: #{get_mood_name(result.mood)}", 290, 570, 365, colour)
-    centre("Gold earned: +#{result.payment}", 290, 570, 406, GOLD)
+    bonus = result.match_score == 100 ? ' (includes +15 bonus)' : ''
+    centre("Gold earned: +#{result.payment}#{bonus}", 290, 570, 406, GOLD)
     centre("Reputation change: #{result.reputation_change}", 290, 570, 444)
     centre('CUSTOMER REACTION', 875, 305, 151, GOLD, @heading_font)
     sprite(@reaction_images[result.mood], 893, 217, 269, 370, @reaction_alpha)
-    centre(get_mood_name(result.mood), 875, 305, 623, colour, @heading_font)
+    stars = 3 - result.mood
+    centre("#{'★' * stars}#{'☆' * (3 - stars)}  #{stars}/3 stars", 875, 305, 590, GOLD, @heading_font)
+    centre(result.timed_out ? 'TIME EXPIRED' : get_mood_name(result.mood), 875, 305, 623, colour, @heading_font)
     if check_game_end(game)
       average = calculate_average_score(game.scores)
-      centre('ALL THREE LEVELS COMPLETED!', 290, 570, 489, GOLD, @heading_font)
+      won = average >= WIN_SCORE
+      centre(won ? 'YOU WIN!' : 'YOU LOSE - TARGET 80%', 290, 570, 489, won ? GOOD : BAD, @heading_font)
       centre("Final gold: #{game.player.gold} | Reputation: #{game.player.reputation}", 290, 570, 530)
-      centre("Average match score: #{average}%", 290, 570, 568, GOLD)
+      centre("Average: #{average}% | Best: #{@high_score}%", 290, 570, 568, GOLD)
       button(310, 645, 260, 54, 'Play Again', GREEN)
       button(580, 645, 260, 54, 'Main Menu', PURPLE)
     else
@@ -848,8 +858,7 @@ class AlchemistApp < Gosu::Window
     end
   end
   def handle_ingredient_click(game, mx, my)
-    slot = 0
-    while slot < 6
+    6.times do |slot|
       index = @ingredient_page * 6 + slot
       if index < game.ingredients.length && clicked?(mx, my, ingredient_x(slot), ingredient_y(slot), 210, 100)
         if game.screen == GameScreen::SHOP
@@ -859,7 +868,6 @@ class AlchemistApp < Gosu::Window
         end
         return true
       end
-      slot += 1
     end
     return false
   end
@@ -874,6 +882,7 @@ class AlchemistApp < Gosu::Window
     end
   end
   def return_to_menu
+    @deadline = nil
     stop_voice
     @guide_line = nil
     @paid_help = nil
@@ -881,11 +890,12 @@ class AlchemistApp < Gosu::Window
     @ingredient_page = 0
   end
   def handle_click(game, mx, my)
-    playing = game.screen == GameScreen::SHOP || game.screen == GameScreen::BREWING || game.screen == GameScreen::RESULTS
-    if playing && clicked?(mx, my, 1018, 30, 146, 37)
-      toggle_audio
+    return if handle_audio_click(mx, my)
+    if @deadline && Gosu.milliseconds >= @deadline
+      finish_potion(game, true)
       return
-    elsif clicked?(mx, my, 40, 674, 215, 36)
+    end
+    if clicked?(mx, my, 40, 674, 215, 36)
       if game.screen == GameScreen::SHOP || game.screen == GameScreen::BREWING
         buy_help(game)
         return
@@ -970,21 +980,21 @@ class AlchemistApp < Gosu::Window
     case @game.screen
     when GameScreen::MENU
       draw_menu
+      return
     when GameScreen::INSTRUCTIONS
       draw_instructions(@game)
-    when GameScreen::SHOP
-      draw_header(@game)
-      draw_shop(@game)
-      draw_message(@game)
-    when GameScreen::BREWING
-      draw_header(@game)
-      draw_brewing(@game)
-      draw_message(@game)
-    when GameScreen::RESULTS
-      draw_header(@game)
-      draw_results(@game)
-      draw_message(@game)
+      return
     end
+    draw_header(@game)
+    case @game.screen
+    when GameScreen::SHOP
+      draw_shop(@game)
+    when GameScreen::BREWING
+      draw_brewing(@game)
+    when GameScreen::RESULTS
+      draw_results(@game)
+    end
+    draw_message(@game)
   end
 end
 AlchemistApp.new.show if __FILE__ == $PROGRAM_NAME
