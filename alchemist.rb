@@ -30,7 +30,6 @@ end
 TOTAL_CUSTOMERS = 10
 STARTING_GOLD = 100
 ROOT = __dir__
-
 # Composite data types (records)
 class Ingredient
   attr_accessor :name, :heat, :calm, :energy, :bitterness,
@@ -63,7 +62,6 @@ end
 class GuideLine
   attr_accessor :key, :text, :sample
 end
-
 # Data files: count followed by the fields of each record.
 def open_data(filename)
   path = File.join(ROOT, filename)
@@ -122,7 +120,6 @@ def load_customers(filename)
   file.close
   return customers
 end
-
 # Three levels share the same brewing logic.
 def get_level(customers_served)
   if customers_served < 3
@@ -151,7 +148,6 @@ def get_available_customers(customers, reputation, level)
   end
   return available
 end
-
 # Choose an unserved customer before repeating any orders.
 def choose_next_customer(game)
   level = get_level(game.player.customers_served)
@@ -204,7 +200,6 @@ def create_game_data
   choose_next_customer(game)
   return game
 end
-
 # Stock management. Return true only when an action succeeds.
 def update_inventory(player, index, amount)
   player.inventory[index] += amount
@@ -223,7 +218,6 @@ def buy_ingredient(game, index)
   game.message = "Purchased #{ingredient.name}."
   return true
 end
-
 # Potion properties and colour are calculated by averaging the ingredients.
 def blend_colour(ingredients, cauldron)
   return Gosu::Color.rgb(45, 45, 55) if cauldron.empty?
@@ -285,7 +279,6 @@ def clear_cauldron(game)
   game.potion = Potion.new
   game.message = 'Cauldron cleared. Ingredients returned.'
 end
-
 # Calculate the original match score and rewards.
 def get_customer_targets(customer)
   return [customer.target_heat, customer.target_calm,
@@ -357,7 +350,6 @@ def serve_potion(game)
   game.message = check_game_end(game) ? 'All customers served!' : 'Potion served successfully.'
   return true
 end
-
 # Presentation: Gosu images, sounds, animation and mouse events.
 class AlchemistApp < Gosu::Window
   WIDTH = 1200
@@ -379,7 +371,7 @@ class AlchemistApp < Gosu::Window
     @heading_font = Gosu::Font.new(26)
     @font = Gosu::Font.new(21)
     @small_font = Gosu::Font.new(17)
-    @guide_font = Gosu::Font.new(16)
+    @guide_font = Gosu::Font.new(15)
     @score_font = Gosu::Font.new(75)
     @game = create_game_data
     @ingredient_page = 0
@@ -388,6 +380,8 @@ class AlchemistApp < Gosu::Window
     @muted = false
     @speech = nil
     @guide_line = nil
+    @paid_help = nil
+    @first_brew_explained = false
     load_media
     @music.volume = 0.22
     @music.play(true)
@@ -395,7 +389,6 @@ class AlchemistApp < Gosu::Window
   def needs_cursor?
     return true
   end
-
   # All images are loaded once; the arrays use the level or mood index.
   def image_asset(folder, filename)
     return Gosu::Image.new(File.join(ROOT, 'assets', folder, filename))
@@ -493,18 +486,15 @@ class AlchemistApp < Gosu::Window
   def level_colour(game)
     return [BLUE, GREEN, RED][current_level(game) - 1]
   end
-
-  # Select narration according to the current level and first customer's order.
+  # Automatic narration is limited to the first order and new levels.
   def shop_voice(game)
+    stop_voice
+    @guide_line = nil
     served = game.player.customers_served
     if served == 0
       say("welcome_#{game.current_customer.image_name}")
-    elsif served == 3
-      say('welcome_2')
-    elsif served == 6
-      say('welcome_3')
-    else
-      say("shop_#{current_level(game)}")
+    elsif served == 3 || served == 6
+      say("welcome_#{current_level(game)}")
     end
   end
   def start_new_game
@@ -512,16 +502,36 @@ class AlchemistApp < Gosu::Window
     @game.screen = GameScreen::SHOP
     @ingredient_page = 0
     @reaction_alpha = 0
+    @first_brew_explained = false
+    @paid_help = nil
     shop_voice(@game) unless @game.current_customer.nil?
   end
   def start_brewing(game)
     return if game.current_customer.nil?
+    stop_voice
+    @guide_line = @paid_help
     game.screen = GameScreen::BREWING
     game.message = 'Compare your potion with the target.'
-    if game.player.customers_served == 0
+    if game.player.customers_served == 0 && !@first_brew_explained
+      @first_brew_explained = true
       say("brew_#{game.current_customer.image_name}")
+    end
+  end
+  # A recipe is purchased once per order, then remains available for free.
+  def buy_help(game)
+    return if game.current_customer.nil?
+    if @paid_help
+      @guide_line = @paid_help
+      replay_voice
+    elsif game.player.gold < 100
+      game.message = 'You need 100 gold to buy a recipe.'
+      play_sound('error')
     else
-      say("brew_#{current_level(game)}")
+      game.player.gold -= 100
+      say("help_#{game.customers.index(game.current_customer)}")
+      @paid_help = @guide_line
+      game.message = 'Recipe unlocked for this order. Ingredient costs are separate.'
+      play_sound('coin')
     end
   end
   def finish_potion(game)
@@ -529,18 +539,14 @@ class AlchemistApp < Gosu::Window
       play_sound('error')
       return
     end
+    stop_voice
+    @guide_line = nil
+    @paid_help = nil
     @reaction_alpha = 0
-    level = current_level(game)
-    mood = game.result.mood
-    if check_game_end(game)
+    if check_game_end(game) || get_level(game.player.customers_served) > current_level(game)
       play_sound('level_up')
-      say('victory')
-    elsif get_level(game.player.customers_served) > level
-      play_sound('level_up')
-      say("advance_#{level}")
     else
-      play_sound(['success', 'click', 'error'][mood])
-      say("#{['happy', 'satisfied', 'disappointed'][mood]}_#{level}")
+      play_sound(['success', 'click', 'error'][game.result.mood])
     end
   end
   def next_customer(game)
@@ -551,7 +557,6 @@ class AlchemistApp < Gosu::Window
     choose_next_customer(game)
     shop_voice(game) unless game.current_customer.nil?
   end
-
   # Shared drawing procedures
   def text(message, x, y, colour = WHITE, font = @font)
     font.draw_text(message, x, y, 5, 1, 1, colour)
@@ -592,7 +597,6 @@ class AlchemistApp < Gosu::Window
     Gosu.draw_rect(x + 2, y + 2, width - 4, height - 4, colour, 4)
     centre(label, x, width, y + (height - @font.height) / 2.0)
   end
-
   # Fit any sprite inside a rectangle without stretching it.
   def sprite(image, x, y, width, height, alpha = 255)
     scale = [width.to_f / image.width, height.to_f / image.height].min
@@ -638,13 +642,16 @@ class AlchemistApp < Gosu::Window
     bob = speaking? ? (12 - ((@animation % 48) - 24).abs / 2) : 0
     sprite(@mentor_images[level - 1], 34, 202 - bob, 227, 236)
     Gosu.draw_rect(35, 450, 225, 2, GOLD, 3)
-    centre(speaking? ? 'Speaking...' : 'Tutorial', 20, 255, 460, GOLD, @small_font)
+    centre(speaking? ? 'Speaking...' : 'Your guide', 20, 255, 460, GOLD, @small_font)
     if @guide_line
       wrap_text(@guide_line.text, 37, 481, 220, @guide_font)
     end
-    button(40, 674, 215, 36, 'Replay Voice', PURPLE)
+    if game.screen == GameScreen::SHOP || game.screen == GameScreen::BREWING
+      button(40, 674, 215, 36, @paid_help ? 'Replay Recipe' : 'Help - 100 gold', PURPLE)
+    elsif tutorial
+      button(40, 674, 215, 36, 'Replay Voice', PURPLE)
+    end
   end
-
   # Decorative cauldron, with live blended colour and frame-based bubbles.
   def draw_cauldron(x, y, colour, active, scale = 1.0)
     body = Gosu::Color.rgb(48, 54, 70)
@@ -698,10 +705,9 @@ class AlchemistApp < Gosu::Window
       index += 1
     end
     text('Level 1: 2 ingredients | Level 2: 3 | Level 3: 4', 321, 534, GOLD)
-    text('The guide speaks at each stage. Press V to replay.', 321, 580, WHITE)
+    text('First order and new levels have guidance. Help costs 100 gold.', 321, 580, WHITE)
     button(555, 645, 350, 50, 'Back to Menu', PURPLE)
   end
-
   # Ingredient shop and brewing share the same cards and input positions.
   def ingredient_x(slot)
     return 310 + (slot % 2) * 220
@@ -870,6 +876,7 @@ class AlchemistApp < Gosu::Window
   def return_to_menu
     stop_voice
     @guide_line = nil
+    @paid_help = nil
     @game = create_game_data
     @ingredient_page = 0
   end
@@ -878,9 +885,14 @@ class AlchemistApp < Gosu::Window
     if playing && clicked?(mx, my, 1018, 30, 146, 37)
       toggle_audio
       return
-    elsif game.screen != GameScreen::MENU && clicked?(mx, my, 40, 674, 215, 36)
-      replay_voice
-      return
+    elsif clicked?(mx, my, 40, 674, 215, 36)
+      if game.screen == GameScreen::SHOP || game.screen == GameScreen::BREWING
+        buy_help(game)
+        return
+      elsif game.screen == GameScreen::INSTRUCTIONS
+        replay_voice
+        return
+      end
     end
     if game.screen == GameScreen::SHOP || game.screen == GameScreen::BREWING
       return if handle_ingredient_click(game, mx, my)
@@ -917,7 +929,8 @@ class AlchemistApp < Gosu::Window
         game.screen = GameScreen::SHOP
         game.message = 'Returned to the shop.'
         play_sound('click')
-        say("shop_#{current_level(game)}")
+        stop_voice
+        @guide_line = @paid_help
       elsif clicked?(mx, my, 799, 645, 357, 54)
         finish_potion(game)
       end
@@ -974,5 +987,4 @@ class AlchemistApp < Gosu::Window
     end
   end
 end
-
 AlchemistApp.new.show if __FILE__ == $PROGRAM_NAME

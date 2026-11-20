@@ -1,55 +1,39 @@
-27
+19
 tutorial
-Welcome, apprentice! Buy ingredients, read the request, and brew a potion. Match the four properties. Serve ten customers to complete all three levels.
+Welcome, apprentice. Buy ingredients or use your starting stock. Brew a potion that matches the customer's four targets. Serve ten customers to finish. Need a recipe? Help costs one hundred gold.
 welcome_goblin
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. Try Lavender and Honey. Click their cards to buy more, then click Start Brewing.
+Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need lavender and honey. Click their cards to buy more if needed. Then select Start Brewing.
 welcome_barbarian
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. Try Ember Root and Sun Petal. Buy more if needed, then click Start Brewing.
+Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need ember root and sun petal. Buy more if needed. Then select Start Brewing.
 welcome_archer
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. Try Lavender and Mint. Buy more if needed, then click Start Brewing.
-welcome_2
-Welcome to level two, skilled alchemist. I am the Night Witch. Use at least three ingredients in every potion. At reputation three, you can buy Nightshade. Stock up, then start brewing.
-welcome_3
-Welcome to level three, master alchemist! I am the Fire Wizard. Use at least four ingredients. Royal customers want more complex recipes. Watch your gold and match their targets carefully.
-shop_1
-A new customer has arrived! Buy any ingredients you need. When you are ready, click Start Brewing.
-shop_2
-Read the new request. Keep enough ingredients in stock for a three ingredient potion, then start brewing.
-shop_3
-Prepare for your next royal customer. Make sure you own at least four ingredients. Click Start Brewing when ready.
+Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need lavender and mint. Buy more if needed. Then select Start Brewing.
 brew_goblin
-Click Lavender once, then Honey once. Their mixture matches the target. Watch the liquid change colour. Now click Serve Potion.
+Click lavender once, then honey once. Look at the target values and the changing colour. When they match, select Serve Potion.
 brew_barbarian
-Click Ember Root once, then Sun Petal once. Their mixture matches the target. Watch the cauldron change colour. Now click Serve Potion.
+Click ember root once, then sun petal once. Look at the target values and the changing colour. When they match, select Serve Potion.
 brew_archer
-Click Lavender once, then Mint once. Their mixture matches the target. Watch the cauldron change colour. Now click Serve Potion.
-brew_1
-Choose at least two ingredients. Compare your potion with all four targets. Clear the cauldron to try again, or click Serve Potion.
-brew_2
-Add at least three ingredients. Match the heat, calm, energy and bitterness values. Clear the cauldron if you need a new mixture.
-brew_3
-Use four ingredients or more. Balance the properties carefully. You can clear the cauldron to recover everything before serving.
-happy_1
-Wonderful! Your customer is happy. You earned gold and reputation. Click Next Customer to continue.
-satisfied_1
-Not bad! The customer is satisfied. You earned some gold. Try a closer match on your next potion.
-disappointed_1
-Oh dear! Your potion was too far from the target. Try a different combination next time.
-happy_2
-Excellent brewing. Your customer is happy. Use your reward to keep the shop stocked.
-satisfied_2
-An acceptable potion. You earned gold, but no reputation. Work on matching the four properties.
-disappointed_2
-A disappointing result. Think about which ingredients changed each property, and try again with the next customer.
-happy_3
-Splendid work, master alchemist! A happy customer and another reputation point. Keep it up!
-satisfied_3
-A fair result. You earned some gold, but a closer match would improve your reputation.
-disappointed_3
-That was not quite what the customer wanted. Revise your mixture and aim closer to the target next time.
-advance_1
-You have served three customers! Level two is unlocked. The Night Witch will guide you through the next challenge.
-advance_2
-Six customers served. Level three is unlocked. The Fire Wizard will guide your final challenge.
-victory
-Congratulations, master alchemist! You have served ten customers and completed all three levels. Check your gold, reputation and average match score. Well done!
+Click lavender once, then mint once. Look at the target values and the changing colour. When they match, select Serve Potion.
+welcome_2
+Welcome to level two. I am the Night Witch. From now on, each potion needs at least three ingredients, one more than before. Match all four targets. Good luck!
+welcome_3
+Welcome to level three, master alchemist. Each potion now needs at least four ingredients, one more than before. Balance all four properties carefully. You can do this!
+help_0
+Recipe: 1 Lavender + 1 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_1
+Recipe: 1 Ember Root + 1 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_2
+Recipe: 1 Lavender + 1 Mint. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_3
+Recipe: 2 Mint + 2 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_4
+Recipe: 2 Lavender + 1 Mint + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_5
+Recipe: 2 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_6
+Recipe: 1 Lavender + 1 Mint + 4 Nightshade. Expected match: 98 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_7
+Recipe: 2 Lavender + 1 Ember Root + 1 Mint + 1 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_8
+Recipe: 1 Ember Root + 5 Mint + 1 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+help_9
+Recipe: 1 Lavender + 1 Ember Root + 1 Mint + 1 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
