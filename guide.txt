@@ -1,39 +1,57 @@
-19
+28
 tutorial
-Welcome, apprentice. Buy ingredients or use your starting stock. Brew a potion that matches the customer's four targets. Serve ten customers to finish. Need a recipe? Help costs one hundred gold.
+Welcome apprentice, buy ingredients and brew potions that match all four targets, then serve ten customers with an average of at least eighty percent to win.
 welcome_goblin
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need lavender and honey. Click their cards to buy more if needed. Then select Start Brewing.
+Hello apprentice, welcome to the apothecary, you have one hundred gold, visit the shop to buy lavender and honey if needed, return to the workbench, then click Start Brewing.
 welcome_barbarian
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need ember root and sun petal. Buy more if needed. Then select Start Brewing.
+Hello apprentice, welcome to the apothecary, you have one hundred gold, visit the shop to buy ember root and sun petal if needed, return to the workbench, then click Start Brewing.
 welcome_archer
-Hello, apprentice! Welcome to Alchemist's Apothecary. You start with one hundred gold. Good potions earn gold and reputation. For this order, you need lavender and mint. Buy more if needed. Then select Start Brewing.
+Hello apprentice, welcome to the apothecary, you have one hundred gold, visit the shop to buy lavender and mint if needed, return to the workbench, then click Start Brewing.
 brew_goblin
-Click lavender once, then honey once. Look at the target values and the changing colour. When they match, select Serve Potion.
+Add one lavender and one honey, then click Serve Potion when all four properties match to earn gold and reputation.
 brew_barbarian
-Click ember root once, then sun petal once. Look at the target values and the changing colour. When they match, select Serve Potion.
+Add one ember root and one sun petal, then click Serve Potion when all four properties match to earn gold and reputation.
 brew_archer
-Click lavender once, then mint once. Look at the target values and the changing colour. When they match, select Serve Potion.
+Add one lavender and one mint, then click Serve Potion when all four properties match to earn gold and reputation.
 welcome_2
-Welcome to level two. I am the Night Witch. From now on, each potion needs at least three ingredients, one more than before. Match all four targets. Good luck!
+Welcome to level two apprentice, you now need at least three ingredients and have ninety seconds to serve each potion once you start brewing.
 welcome_3
-Welcome to level three, master alchemist. Each potion now needs at least four ingredients, one more than before. Balance all four properties carefully. You can do this!
+Welcome to level three master alchemist, you now need at least four ingredients and have only sixty seconds to serve each potion once you start brewing.
 help_0
-Recipe: 1 Lavender + 1 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one lavender and one honey for a perfect match.
 help_1
-Recipe: 1 Ember Root + 1 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one ember root and one sun petal for a perfect match.
 help_2
-Recipe: 1 Lavender + 1 Mint. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one lavender and one mint for a perfect match.
 help_3
-Recipe: 2 Mint + 2 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add two mint and two sun petal for a perfect match.
 help_4
-Recipe: 2 Lavender + 1 Mint + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add two lavender, one mint and two honey for a perfect match.
 help_5
-Recipe: 2 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add two sun petal and two honey for a perfect match.
 help_6
-Recipe: 1 Lavender + 1 Mint + 4 Nightshade. Expected match: 98 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one lavender, one mint and four nightshade for a ninety eight percent match.
 help_7
-Recipe: 2 Lavender + 1 Ember Root + 1 Mint + 1 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add two lavender, one ember root, one mint, one sun petal and two honey for a perfect match.
 help_8
-Recipe: 1 Ember Root + 5 Mint + 1 Sun Petal + 2 Honey. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one ember root, five mint, one sun petal and two honey for a perfect match.
 help_9
-Recipe: 1 Lavender + 1 Ember Root + 1 Mint + 1 Sun Petal. Expected match: 100 percent. Clear your cauldron first. Buy missing ingredients, then add exactly these quantities.
+Clear your cauldron, buy what you need and add one lavender, one ember root, one mint and one sun petal for a perfect match.
+perfect_1
+Wow, a perfect potion!
+happy_1
+Well done apprentice, your customer is happy!
+disappointed_1
+Tough luck apprentice, try a different mixture next time.
+perfect_2
+Wonderful, a perfect match!
+happy_2
+Well done, your customer is happy!
+disappointed_2
+Tough luck, you can do better next time.
+perfect_3
+Magnificent, a perfect potion!
+happy_3
+Excellent work, master alchemist!
+disappointed_3
+Try harder next time, you can do it.
