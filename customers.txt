@@ -1,5 +1,5 @@
-9
-Mara the Baker
+10
+Goblin
 I need something warm and calming.
 3
 9
@@ -8,7 +8,8 @@ I need something warm and calming.
 30
 0
 1
-Oliver the Farmer
+goblin
+Barbarian
 I need a warm potion for energy.
 8
 1
@@ -17,7 +18,8 @@ I need a warm potion for energy.
 30
 0
 1
-Luna the Traveller
+barbarian
+Archer
 I need a cooling and calming potion.
 -3
 8
@@ -26,7 +28,8 @@ I need a cooling and calming potion.
 30
 0
 1
-Arthur the Knight
+archer
+Knight
 I need energy without too much heat.
 -1
 3
@@ -35,7 +38,8 @@ I need energy without too much heat.
 40
 0
 2
-Sofia the Healer
+knight
+Valkyrie
 I need a balanced and soothing potion.
 1
 8
@@ -44,7 +48,8 @@ I need a balanced and soothing potion.
 40
 0
 2
-Henry the Merchant
+valkyrie
+Spear Goblin
 I need something sweet and energising.
 5
 4
@@ -53,7 +58,8 @@ I need something sweet and energising.
 45
 0
 2
-Isabella the Queen
+spear_goblin
+Princess
 Create a cool bitter potion that calms me.
 -5
 8
@@ -62,7 +68,8 @@ Create a cool bitter potion that calms me.
 60
 3
 3
-Elias the Wizard
+princess
+Prince
 Balance warmth, calm, energy and bitterness.
 3
 6
@@ -71,7 +78,8 @@ Balance warmth, calm, energy and bitterness.
 55
 0
 3
-Rowan the Alchemist
+prince
+Royal Archer
 Make a cool potion with energy and little bitterness.
 -2
 5
@@ -80,3 +88,14 @@ Make a cool potion with energy and little bitterness.
 60
 0
 3
+archer
+Royal Knight
+Make a balanced, warm potion for a royal guard.
+3
+5
+5
+1
+55
+0
+3
+knight
