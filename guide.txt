@@ -14,9 +14,9 @@ Add one ember root and one sun petal, then click Serve Potion when all four prop
 brew_archer
 Add one lavender and one mint, then click Serve Potion when all four properties match to earn gold and reputation.
 welcome_2
-Welcome to level two apprentice, you now need at least three ingredients and have ninety seconds to serve each potion once you start brewing.
+Welcome to level two apprentice. You now need at least three ingredients and have sixty seconds to serve each potion once you start brewing.
 welcome_3
-Welcome to level three master alchemist, you now need at least four ingredients and have only sixty seconds to serve each potion once you start brewing.
+Welcome to level three master alchemist. You now need at least four ingredients and have only thirty seconds to serve each potion once you start brewing.
 help_0
 Clear your cauldron, buy what you need and add one lavender and one honey for a perfect match.
 help_1

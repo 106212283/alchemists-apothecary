@@ -1,0 +1,16 @@
+Customer,Ingredients,Rank,Combination,Potion Heat/Calm/Energy/Bitterness,Target Heat/Calm/Energy/Bitterness,Match Percent
+Goblin,2,1,Lavender + Honey,3/9/3/-3,3/9/3/-3,100
+Goblin,2,2,Honey + Honey,4/8/6/-6,3/9/3/-3,80
+Goblin,2,3,Lavender + Lavender,2/10/0/0,3/9/3/-3,80
+Goblin,2,4,Mint + Honey,-2/7/5/-3,3/9/3/-3,78
+Goblin,2,5,Ember Root + Honey,7/5/5/-2,3/9/3/-3,73
+Knight,3,1,Mint + Mint + Sun Petal,-3/4/6/1,-1/3/7/1,90
+Knight,3,2,Mint + Sun Petal + Sun Petal,1/2/8/1,-1/3/7/1,90
+Knight,3,3,Ember Root + Mint + Sun Petal,3/3/6/1,-1/3/7/1,88
+Knight,3,4,Lavender + Mint + Sun Petal,0/5/5/1,-1/3/7/1,88
+Knight,3,5,Ember Root + Mint + Mint,-2/5/4/1,-1/3/7/1,85
+Princess,4,1,Lavender + Mint + Nightshade + Nightshade,-5/8/-2/5,-5/8/-2/7,95
+Princess,4,2,Nightshade + Nightshade + Nightshade + Honey,-4/8/-3/6,-5/8/-2/7,93
+Princess,4,3,Mint + Nightshade + Nightshade + Honey,-4/8/-1/4,-5/8/-2/7,88
+Princess,4,4,Mint + Nightshade + Nightshade + Nightshade,-7/8/-4/8,-5/8/-2/7,88
+Princess,4,5,Sun Petal + Nightshade + Nightshade + Nightshade,-3/6/-2/8,-5/8/-2/7,88

@@ -1,0 +1,31 @@
+User-supplied voice recordings, matched by numbered upload order.
+Purple Witch: 0-12; Night Witch: 13-19; Wizard: 20-27.
+
+00 -> sounds/voices/tutorial.wav
+01 -> sounds/voices/welcome_goblin.wav
+02 -> sounds/voices/welcome_barbarian.wav
+03 -> sounds/voices/welcome_archer.wav
+04 -> sounds/voices/brew_goblin.wav
+05 -> sounds/voices/brew_barbarian.wav
+06 -> sounds/voices/brew_archer.wav
+07 -> sounds/voices/help_0.wav
+08 -> sounds/voices/help_1.wav
+09 -> sounds/voices/help_2.wav
+10 -> sounds/voices/perfect_1.wav
+11 -> sounds/voices/happy_1.wav
+12 -> sounds/voices/disappointed_1.wav
+13 -> sounds/voices/welcome_2.wav
+14 -> sounds/voices/help_3.wav
+15 -> sounds/voices/help_4.wav
+16 -> sounds/voices/help_5.wav
+17 -> sounds/voices/perfect_2.wav
+18 -> sounds/voices/happy_2.wav
+19 -> sounds/voices/disappointed_2.wav
+20 -> sounds/voices/welcome_3.wav
+21 -> sounds/voices/help_6.wav
+22 -> sounds/voices/help_7.wav
+23 -> sounds/voices/help_8.wav
+24 -> sounds/voices/help_9.wav
+25 -> sounds/voices/perfect_3.wav
+26 -> sounds/voices/happy_3.wav
+27 -> sounds/voices/disappointed_3.wav
